@@ -1,0 +1,15 @@
+{
+  "require": {
+    "twig/twig": "^3.0",
+    "php": "^7.4||^8.0",
+    "ext-openssl": "*",
+    "ext-pdo": "*"
+  },
+  "autoload": {
+    "psr-4": {
+      "Core\\": "Core/",
+      "App\\": "App/"
+    }
+  }
+}
+
