@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+
+{% block title %}Error{% endblock %}
+
+{% block body %}
+
+<!--    <h1>An error occurred</h1>-->
+<!--    <p>Sorry, an error has occurred.</p>-->
+
+<div class="container text-center">
+    <div class="row centered-form">
+        <div class="col-xs-12 col-sm-8 col-md-4 col-sm-offset-2 col-md-offset-4">
+            <div class="alert alert-danger" role="alert">
+                <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>
+                {% for errRow in errors %}
+                <span class="sr-only">Error: </span>
+                {{ errRow }}
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

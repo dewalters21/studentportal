@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+
+{% block title %}Home{% endblock %}
+
+{% block body %}
+<div class="container text-center">
+    {% if current_user %}
+    <h1>Welcome to the Student Portal Home Page, {{current_user}}!</h1>
+    {% else %}
+    <h1>Welcome to the Student Portal Home Page.</h1>
+    <h3>To log in, please click the Login link in the menu above.</h3>
+    <h4>Don't have a login?  Click the Registration link in the menu above.</h4>
+    {% endif %}
+</div>
+{% endblock %}
