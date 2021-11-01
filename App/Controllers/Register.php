@@ -2,6 +2,7 @@
 
 namespace App\Controllers;
 
+use App\Config;
 use Core\View;
 use Core\Controller;
 use App\Models\User;
@@ -21,7 +22,9 @@ class Register extends Controller
      */
     public function indexAction()
     {
-        View::renderTemplate('/users/register.html');
+        $config = new Config;
+        $states = $config->states;
+        View::renderTemplate('/users/register.html', [ 'states' => $states ]);
     }
 
     /**
@@ -34,17 +37,20 @@ class Register extends Controller
         $curr_user = $_POST;
         $user = new User($curr_user);
         $result = $user->create();
+        $config = new Config;
+        $states = $config->states;
         if ($result === true) {
             $success = ['Registration successful!'];
-            User::sendToLog(date('G:i:s').": Registration successful for ".$_POST['email'].".".PHP_EOL);
+            User::sendToLog("Registration successful for ".$_POST['email'].".".PHP_EOL);
             View::renderTemplate('/home/login.html', [
                 'success' => $success
             ]);
         } else {
-            User::sendToLog(date('G:i:s').": Registration failed for ".$_POST['email'].": ".$result[0].PHP_EOL);
+            User::sendToLog("Registration failed for ".$_POST['email'].": ".$result[0].PHP_EOL);
             View::renderTemplate('/users/register.html', [
                 'errors' => $result,
-                'user' => $curr_user
+                'user' => $curr_user,
+                'states' => $states
             ]);
         }
     }

@@ -11,7 +11,7 @@
         <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>
         {% for errRow in errors %}
         <span class="sr-only">Error: </span>
-        {{ errRow }}
+        {{ errRow }}<br/>
         {% endfor %}
       </div>
     </div>
@@ -22,7 +22,7 @@
         <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>
         {% for succRow in success %}
         <span class="sr-only">Success: </span>
-        {{ succRow }}
+        {{ succRow }}<br/>
         {% endfor %}
       </div>
     </div>
@@ -37,36 +37,64 @@
             <div class="row">
               <div class="col-xs-6 col-sm-6 col-md-6">
                 <div class="form-group">
+                  <div class="text-left">
+                    <label for="first_name">First Name</label>
+                  </div>
                   <input type="text" name="first_name" id="first_name" class="form-control input-sm" placeholder="First Name" value="{{user.first_name}}" required autofocus />
                 </div>
               </div>
               <div class="col-xs-6 col-sm-6 col-md-6">
                 <div class="form-group">
+                  <div class="text-left">
+                    <label for="last_name">Last Name</label>
+                  </div>
                   <input type="text" name="last_name" id="last_name" class="form-control input-sm" placeholder="Last Name" value="{{user.last_name}}" required />
                 </div>
               </div>
             </div>
             <div class="form-group">
+              <div class="text-left">
+                <label for="address" class="">Street Address</label>
+              </div>
               <input type="text" name="address" id="address" class="form-control input-sm" placeholder="Street Address" value="{{user.address}}" required />
             </div>
             <div class="row">
               <div class="col-xs-6 col-sm-6 col-md-6">
                 <div class="form-group">
+                  <div class="text-left">
+                    <label for="city" class="">City</label>
+                  </div>
                   <input type="text" name="city" id="city" class="form-control input-sm" maxlength="30" placeholder="City" value="{{user.city}}" required />
                 </div>
               </div>
               <div class="col-xs-6 col-sm-6 col-md-6">
                 <div class="form-group">
-                  <input type="text" name="state" id="state" class="form-control input-sm" maxlength="2" placeholder="State" value="{{user.state}}" required />
+                  <div class="text-left">
+                    <label for="state" class="">State</label>
+                  </div>
+                  <select name="state" id="state" class="form-control input-sm" required>
+                    <option value="">Select a State</option>
+                    {% for state in states %}
+                    <option value="{{state.abbr}}"{% if state.abbr is same as(user.state) %} selected{% endif %}>{{state.name}}</option>
+                    {% endfor %}
+                  </select>
                 </div>
               </div>
+            </div>
+            <div class="row">
               <div class="col-xs-6 col-sm-6 col-md-6">
                 <div class="form-group">
+                  <div class="text-left">
+                    <label for="zipcode" class="">Zip Code</label>
+                  </div>
                   <input type="text" name="zipcode" id="zipcode" class="form-control input-sm" maxlength="10" placeholder="Zip Code" value="{{user.zipcode}}" required />
                 </div>
               </div>
                 <div class="col-xs-6 col-sm-6 col-md-6">
                 <div class="form-group">
+                  <div class="text-left">
+                    <label for="ssn" class="">SSN</label>
+                  </div>
                   <input type="text" name="ssn" id="ssn" class="form-control input-sm" pattern="(!^\d{3}-\d{2}-\d{4}$" maxlength="11" placeholder="Social Security Number" value="{{user.ssn}}" required />
                 </div>
               </div>
@@ -74,20 +102,27 @@
             <div class="row">
               <div class="col-xs-6 col-sm-6 col-md-6">
                 <div class="form-group">
-                  <input type="tel" name="homephone" id="homephone" class="form-control input-sm" pattern="(!^\d{3}-\d{3}-\d{4}$" maxlength="20" placeholder="Home Phone" value="{{user.phone}}" required />
+                  <div class="text-left">
+                    <label for="homephone" class="">Home Phone</label>
+                  </div>
+                  <input type="tel" name="homephone" id="homephone" class="form-control input-sm" pattern="(!^\d{3}-\d{3}-\d{4}$" maxlength="20" placeholder="Home Phone" value="{{user.homephone}}" required />
                 </div>
               </div>
               <div class="col-xs-6 col-sm-6 col-md-6">
                 <div class="form-group">
-                  <input type="tel" name="cellphone" id="cellphone" class="form-control input-sm" pattern="(!^\d{3}-\d{3}-\d{4}$" maxlength="20" placeholder="Cell Phone" value="{{user.phone}}" required />
+                  <div class="text-left">
+                    <label for="cellphone" class="">Cell Phone</label>
+                  </div>
+                  <input type="tel" name="cellphone" id="cellphone" class="form-control input-sm" pattern="(!^\d{3}-\d{3}-\d{4}$" maxlength="20" placeholder="Cell Phone" value="{{user.cellphone}}" required />
                 </div>
               </div>
-              <div class="col-xs-6 col-sm-6 col-md-6">
-              </div>
             </div>
-            <div class="form-group">
+              <div class="form-group">
+                <div class="text-left">
+                  <label for="email" class="">Email Address</label>
+                </div>
               <input type="email" name="email" id="email" class="form-control input-sm" maxlength="50" placeholder="Email Address" value="{{user.email}}" required />
-            </div>
+              </div>
             <div class="row">
               <div class="col-xs-6 col-sm-6 col-md-6">
                 <div class="form-group">

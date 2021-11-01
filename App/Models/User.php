@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Config;
 use PDOException;
 use Core\Model;
 
@@ -13,7 +14,7 @@ use Core\Model;
 class User extends Model
 {
     /**
-     * Error messages
+     * Error arrays
      * @var array
      */
     public array $errors = [];
@@ -40,6 +41,7 @@ class User extends Model
     {
         global $errors;
         User::validate($_POST);
+        User::validatePwd($_POST['password']);
         if (empty($errors)) {
             $sql = "INSERT INTO tbluser (firstName, lastName, streetAddr, city, state, zipcode, email, homephone, cellphone, ssn, password) VALUES (:first_name, :last_name, :streetAddr, :city, :state, :zipcode, :email, :homephone, :cellphone, :ssn, :password)";
             $params = [
@@ -79,71 +81,109 @@ class User extends Model
     public static function validate(array $data): void
     {
         global $errors;
+        $config = new Config;
+        $areacodes = $config->area_codes;
         /** Name **/
         if (isset($data['first_name']) && $data['first_name'] == '') {
-            $errors[] = 'First name is required';
+            $errors[] = 'First name is required.'.PHP_EOL;
         }
         if (isset($data['last_name']) && $data['last_name'] == '') {
-            $errors[] = 'Last name is required';
+            $errors[] = 'Last name is required.'.PHP_EOL;
         }
         /** Mailing Address **/
         if (isset($data['address']) && $data['address'] == '') {
-            $errors[] = 'Mailing address is required';
+            $errors[] = 'Mailing address is required.'.PHP_EOL;
         }
-        /** Phone Number **/
-        if (isset($data['phone']) && $data['phone'] == '') {
-            $errors[] = 'Phone number is required';
+        if (isset($data['city']) && $data['city'] == '') {
+            $errors[] = 'City is required.'.PHP_EOL;
         }
-        if (isset($data['phone'])) {
-            $nums_only = preg_replace("/[^\d]/", "", $data['phone']);
-            if (strlen($nums_only) != 10) {
-                $errors[] = 'Invalid US phone number.';
+        if (isset($data['state']) && $data['state'] == '') {
+            $errors[] = 'State is required.'.PHP_EOL;
+        }
+        if (isset($data['zipcode']) && $data['zipcode'] == '') {
+            $errors[] = 'Zip code is required.'.PHP_EOL;
+        }
+        /** Phone Numbers **/
+        if ((isset($data['homephone']) && ($data['homephone'] != '')) OR (isset($data['cellphone']) && ($data['cellphone'] != ''))) {
+            if (isset($data['homephone'])) {
+                $nums_only = preg_replace("/[^\d]/", "", $data['homephone']);
+                if (strlen($nums_only) != 10) {
+                    $errors[] = 'Home phone is not a valid US phone number (i.e. 541-555-1212).';
+                } else {
+                    if (in_array(intval(substr($data['homephone'], 0, 3)), $areacodes)) {
+                        // Do nothing
+                    } else {
+                        $errors[] = 'Home phone area code is not a valid US area code.';
+                    }
+                }
             }
+            if (isset($data['cellphone'])) {
+                $nums_only = preg_replace("/[^\d]/", "", $data['cellphone']);
+                if (strlen($nums_only) != 10) {
+                    $errors[] = 'Cell phone is not a valid US phone number (i.e. 541-555-1212).';
+                } else {
+                    if (in_array(intval(substr($data['cellphone'], 0, 3)), $areacodes)) {
+                        // Do nothing
+                    } else {
+                        $errors[] = 'Cell phone area code is not a valid US area code.';
+                    }
+                }
+            }
+        } else {
+            $errors[] = 'At least one phone number is required.' . PHP_EOL;
         }
         /** Social Security Number **/
         if (isset($data['ssn']) && $data['ssn'] == '') {
-            $errors[] = 'Social security number is required';
+            $errors[] = 'Social security number is required.'.PHP_EOL;
         }
         if (isset($data['ssn'])) {
             $numbers_only = preg_replace("/[^\d]/", "", $data['ssn']);
             if (strlen($numbers_only) != 9) {
-                $errors[] = 'Invalid social security number';
+                $errors[] = 'Invalid social security number.'.PHP_EOL;
             }
-        }
-        /** Salary **/
-        if (isset($data['salary']) && $data['salary'] == '') {
-            $errors[] = 'Salary is required';
-        }
-        if (isset($data['salary']) && !is_numeric($data['salary'])) {
-            $errors[] = 'Not a valid salary.  Please enter a value in ###.## format.';
         }
         /** email address **/
         if (isset($data['email']) && $data['email'] == '') {
-            $errors[] = 'Email address is required';
+            $errors[] = 'Email address is required.'.PHP_EOL;
         }
         if (isset($data['email']) && (filter_var($data['email'], FILTER_VALIDATE_EMAIL) === false)) {
-            $errors[] = 'Invalid email';
+            $errors[] = 'Invalid email.'.PHP_EOL;
         }
         if (isset($data['email']) && (static::emailExists($data['email'], $data['id'] ?? null))) {
-            $errors[] = 'Email address already exists';
+            $errors[] = 'Email address already exists.'.PHP_EOL;
         }
+    }
+
+    /**
+     * Function name:  validatepwd()
+     * Task:           Validate user password
+     * Arguments:
+     * Returns:
+     * @param array $data
+     * @return void
+     */
+    public static function validatePwd(array $data): void
+    {
+        global $errors;
         /** Password **/
         if (isset($data['password'])) {
             if (strlen($data['password']) < 8) {
-                $errors[] = 'Please enter at least 8 characters for the password';
+                $errors[] = 'Please enter at least 8 characters for the password.'.PHP_EOL;
             }
             if (preg_match('/.*[a-z]+.*/i', $data['password']) == 0) {
-                $errors[] = 'Password needs at least one lowercase letter';
+                $errors[] = 'Password needs at least one lowercase letter.'.PHP_EOL;
             }
             if (preg_match('/.*[A-Z]+.*/i', $data['password']) == 0) {
-                $errors[] = 'Password needs at least one uppercase letter';
+                $errors[] = 'Password needs at least one uppercase letter.'.PHP_EOL;
             }
             if (preg_match('/.*\d+.*/i', $data['password']) == 0) {
-                $errors[] = 'Password needs at least one number';
+                $errors[] = 'Password needs at least one number.'.PHP_EOL;
             }
             if (preg_match('/.*[!@#$%^&*-]+.*/i', $data['password']) == 0) {
-                $errors[] = 'Password needs at least one special character (!@#$%^&*-)';
+                $errors[] = 'Password needs at least one special character (!@#$%^&*-).'.PHP_EOL;
             }
+        } else {
+            $errors[] = 'No password to valide.'.PHP_EOL;
         }
     }
 
@@ -275,7 +315,7 @@ class User extends Model
     public static function updatePassword(array $data): bool
     {
         global $errors;
-        User::validate($data);
+        User::validatePwd($data);
         if (empty($errors)) {
             $sql = 'UPDATE tbluser SET password = :password WHERE id = :id';
             if ((isset($data['password'])) && (isset($data['password_confirmation']))) {
@@ -310,8 +350,9 @@ class User extends Model
      */
     public static function sendToLog(string $data): bool
     {
-        $data .= $data . PHP_EOL . "-----------------------" . PHP_EOL;
-        if (file_put_contents('../logs/log_'.date("j.n.Y"), $data, FILE_APPEND)) {
+        $logdata = date('G:i:s').": " . $data . PHP_EOL . "-----------------------" . PHP_EOL;
+        $filename = '../logs/log_'.date("y.m.d").'.log';
+        if (file_put_contents($filename, $logdata, FILE_APPEND)) {
             return true;
         } else {
             return false;

@@ -5,7 +5,6 @@ namespace App\Controllers;
 
 
 use App\Auth;
-use App\Flash;
 use App\Models\User;
 use Core\Controller;
 use Core\View;
@@ -57,11 +56,15 @@ class Login extends Controller
      */
     public function destroyAction()
     {
-        Auth::logout();
-        $success = ['You have been logged out!'];
-        View::renderTemplate('/home/login.html', [
-            'success' => $success
-        ]);
+        if (isset($_SESSION['user_id'])) {
+            Auth::logout();
+            $success = ['You have been logged out!'];
+            View::renderTemplate('/home/login.html', [
+                'success' => $success
+            ]);
+        } else {
+            View::renderTemplate('/home/index.html');
+        }
     }
 
 }

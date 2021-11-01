@@ -22,8 +22,17 @@ class Enroll extends Controller
      */
     public function indexAction()
     {
-        if (isset()) {
-
+        if (isset($_SESSION['user_id'])) {
+            $user = User::findByID($_SESSION['user_id']);
+            View::renderTemplate('enroll/index.html', [
+            'user' => $user,
+            'current_user' => $user['firstName']
+        ]);
+        } else {
+            $errors = ['You are not logged in!'];
+            View::renderTemplate('/home/index.html', [
+                'errors' => $errors
+            ]);
         }
     }
 

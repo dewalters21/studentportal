@@ -24,7 +24,7 @@ class Auth
         session_regenerate_id(true);
         $_SESSION['user_id'] = $user['id'];
         $_SESSION['username'] = $user['firstName'];
-        User::sendToLog(date('G:i:s').": User ".$user['email']." logged in.".PHP_EOL);
+        User::sendToLog("User " . $user['email'] . " logged in.");
     }
 
     /**
@@ -52,7 +52,7 @@ class Auth
         }
         // Finally destroy the session
         session_destroy();
-        User::sendToLog(date('G:i:s').": User ".$thisuser['email']." logged out.".PHP_EOL);
+        User::sendToLog("User " . $thisuser['email'] . " logged out." . PHP_EOL . "=========================");
     }
 
     /**
