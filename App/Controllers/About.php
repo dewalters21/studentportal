@@ -3,6 +3,8 @@
 
 namespace App\Controllers;
 
+use App\Auth;
+use App\Config;
 use App\Models\User;
 use Core\Controller;
 use Core\View;
@@ -16,6 +18,42 @@ class About extends Controller
 {
 
     /**
+     * Before filter
+     *
+     * @return void
+     */
+    protected function before()
+    {
+        if (isset($_SESSION['last_action'])) { // Test to make sure the "last action" session variable was set.
+            $secondsInactive = time() - $_SESSION['last_action']; // How many seconds have passed since user's last action.
+            $expireAfterSeconds = Config::EXPIRE_AFTER * 60;
+            if ($secondsInactive >= $expireAfterSeconds) {
+                if (isset($_SESSION['user_id'])) {
+                    Auth::logout();
+                    $success = ['You have been logged out!'];
+                    View::renderTemplate('/home/login.html', [
+                        'success' => $success
+                    ]);
+                    exit(0);
+                } else {
+                    View::renderTemplate('/home/index.html');
+                    exit(0);
+                }
+            }
+        }
+    }
+
+    /**
+     * After filter
+     *
+     * @return void
+     */
+    protected function after()
+    {
+        $_SESSION['last_action'] = time();
+    }
+
+    /**
      * Show the index page
      *
      * @return void
@@ -25,7 +63,7 @@ class About extends Controller
         if (isset($_SESSION['user_id'])) {
             $user = User::findByID($_SESSION['user_id']);
             View::renderTemplate('/home/about.html', [
-                'current_user' => $user['firstName']
+                'current_user' => $user[0]['firstName']
             ]);
         } else {
             View::renderTemplate('/home/about.html');

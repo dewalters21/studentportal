@@ -6,6 +6,25 @@
 <div class="container text-center">
     {% if current_user %}
     <h1>Welcome to the Student Portal Home Page, {{current_user}}!</h1>
+    {% if message %}
+    <br><br>
+    <div class="container text-center">
+        <div class="row centered-form">
+            <div class="col-xs-12 col-sm-8 col-md-6 col-sm-offset-2 col-md-offset-3">
+                <div class="panel panel-default">
+                    <div class="panel-heading">
+                        <h4 class="panel-title alert alert-warning"><b><i>New Message</i></b></h4>
+                    </div>
+                    <div class="panel-body">
+                        <div class="row">
+                            {{ message }}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
     {% else %}
     <h1>Welcome to the Student Portal Home Page.</h1>
     <h3>To log in, please click the Login link in the menu above.</h3>

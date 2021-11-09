@@ -7,127 +7,285 @@
 <script type="text/javascript">window.location.replace("/");</script>
 {% endif %}
 <div class="container text-center">
+    {% if errors %}
     <div class="row centered-form">
-        {% if errors %}
-        <div class="col-xs-12 col-sm-8 col-md-4 col-sm-offset-2 col-md-offset-4">
-            <div class="alert alert-danger" role="alert">
-                <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>
-                {% for errRow in errors %}
-                <span class="sr-only">Error: </span>
-                {{ errRow }}<br/>
-                {% endfor %}
+        <div class="col-xs-12 col-sm-8 col-md-6 col-sm-offset-2 col-md-offset-3">
+            <div class="row">
+                <div class="alert alert-danger" role="alert">
+                    <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>
+                    {% for errRow in errors %}
+                    <span class="sr-only">Error: </span>
+                    {{ errRow }}<br/>
+                    {% endfor %}
+                </div>
             </div>
         </div>
-        {% endif %}
-        {% if success %}
-        <div class="col-xs-12 col-sm-8 col-md-4 col-sm-offset-2 col-md-offset-4">
-            <div class="alert alert-success" role="alert">
-                <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>
-                {% for succRow in success %}
-                <span class="sr-only">Success: </span>
-                {{ succRow }}<br/>
-                {% endfor %}
+    </div>
+    {% endif %}
+    {% if success %}
+    <div class="row centered-form">
+        <div class="col-xs-12 col-sm-8 col-md-6 col-sm-offset-2 col-md-offset-3">
+            <div class="row">
+                <div class="alert alert-success" role="alert">
+                    <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>
+                    {% for succRow in success %}
+                    <span class="sr-only">Success: </span>
+                    {{ succRow }}<br/>
+                    {% endfor %}
+                </div>
             </div>
         </div>
-        {% endif %}
-        <div class="col-xs-12 col-sm-8 col-md-4 col-sm-offset-2 col-md-offset-4">
+    </div>
+</div>
+{% endif %}
+<div class="container text-center">
+    <div class="row centered-form">
+        <div class="col-xs-12 col-sm-8 col-md-6 col-sm-offset-2 col-md-offset-3">
             <div class="panel panel-default">
                 <div class="panel-heading">
-                    <h3 class="panel-title">Course Enrollment</h3>
+                    <h3 class="panel-title"><b>Course Enrollment</b></h3>
                 </div>
                 <div class="panel-body">
-                    <form role="form" action="/enroll/index" method="post">
-                        <div class="row">
-                            <div class="col-xs-6 col-sm-6 col-md-6">
+                    <div class="row">
+                        <div class="col-xs-6 col-sm-6 col-md-6">
+                            <form role="form" id="selTermYr" action="/enroll/settermyr" method="post">
                                 <div class="form-group">
                                     <div class="text-left">
-                                        <label for="first_name">Term</label>
+                                        <label for="term">Term</label>
                                     </div>
-                                    <input type="text" name="first_name" id="first_name" class="form-control input-sm"
-                                           placeholder="First Name" value="{{user.firstName}}" disabled/>
+                                    <select name="term" id="term" class="form-control input-sm"
+                                            onchange="submitForm('selTermYr');">
+                                        <option value="0">Select a Term</option>
+                                        {% for termrow in terms %}
+                                        <option value="{{termrow.id}}" {% if termrow.id== currTerm %}selected{% endif
+                                                %}>{{termrow.term}}
+                                        </option>
+                                        {% endfor %}
+                                    </select>
                                 </div>
-                            </div>
-                            <div class="col-xs-6 col-sm-6 col-md-6">
-                                <div class="form-group">
-                                    <div class="text-left">
-                                        <label for="last_name">Year</label>
-                                    </div>
-                                    <input type="text" name="last_name" id="last_name" class="form-control input-sm"
-                                           placeholder="Last Name" value="{{user.lastName}}" disabled/>
-                                </div>
-                            </div>
                         </div>
-<!--                        <div class="form-group">-->
-<!--                            <div class="text-left">-->
-<!--                                <label for="address" class="">Address</label>-->
-<!--                            </div>-->
-<!--                            <input type="text" name="address" id="address" class="form-control input-sm"-->
-<!--                                   placeholder="Mailing Address" value="{{user.streetAddr}}, {{user.city}}, {{user.state}} {{user.zipcode}}" disabled/>-->
-<!--                        </div>-->
-<!--                        <div class="row">-->
-<!--                            <div class="col-xs-6 col-sm-6 col-md-6">-->
-<!--                                <div class="form-group">-->
-<!--                                    <div class="text-left">-->
-<!--                                        <label for="homephone" class="">Home Phone</label>-->
-<!--                                    </div>-->
-<!--                                    <input type="tel" name="homephone" id="homephone" class="form-control input-sm"-->
-<!--                                           maxlength="12" placeholder="Home Phone" value="{{user.homephone}}" disabled/>-->
-<!--                                </div>-->
-<!--                            </div>-->
-<!--                            <div class="col-xs-6 col-sm-6 col-md-6">-->
-<!--                                <div class="form-group">-->
-<!--                                    <div class="text-left">-->
-<!--                                        <label for="cellphone" class="">Cell Phone</label>-->
-<!--                                    </div>-->
-<!--                                    <input type="tel" name="cellphone" id="cellphone" class="form-control input-sm"-->
-<!--                                           maxlength="12" placeholder="Cell Phone" value="{{user.cellphone}}" disabled/>-->
-<!--                                </div>-->
-<!--                            </div>-->
-<!--                        </div>-->
-<!--                        <div class="row">-->
-<!--                            <div class="col-xs-6 col-sm-6 col-md-6">-->
-<!--                                <div class="form-group">-->
-<!--                                    <div class="text-left">-->
-<!--                                        <label for="ssn" class="">SSN</label>-->
-<!--                                    </div>-->
-<!--                                    <div class="input-group" id="show_hide_ssn">-->
-<!--                                        <input type="password" name="ssn" id="ssn" class="form-control input-sm" maxlength="11" placeholder="Social Security Number" value="{{user.ssn}}" disabled/>-->
-<!--                                        <span class="input-group-btn">-->
-<!--                                            <button class="btn btn-default" type="button" onclick="hideShowSSN()"><i class="glyphicon glyphicon-eye-close"></i></button>-->
-<!--                                        </span>-->
-<!--                                    </div>-->
-<!--                                </div>-->
-<!--                            </div>-->
-<!--                            <div class="col-xs-6 col-sm-6 col-md-6">-->
-<!--                                <div class="form-group">-->
-<!--                                    <div class="text-left">-->
-<!--                                        <label for="ssn" class="">Password</label>-->
-<!--                                    </div>-->
-<!--                                    <div class="input-group" id="show_hide_password">-->
-<!--                                        <input type="password" name="password" id="password" class="form-control input-sm" maxlength="11" placeholder="Password" value="{{user.password}}" disabled/>-->
-<!--                                        <span class="input-group-btn">-->
-<!--                                            <button class="btn btn-default" type="button" onclick="hideShowPwd()"><i class="glyphicon glyphicon-eye-close"></i></button>-->
-<!--                                        </span>-->
-<!--                                    </div>-->
-<!--                                </div>-->
-<!--                            </div>-->
-<!--                        </div>-->
-<!--                        <div class="form-group">-->
-<!--                            <div class="text-left">-->
-<!--                                <label for="email" class="">Email Address</label>-->
-<!--                            </div>-->
-<!--                            <input type="email" name="email" id="email" class="form-control input-sm" maxlength="50"-->
-<!--                                   placeholder="Email Address" value="{{user.email}}" disabled/>-->
-<!--                        </div>-->
-                        <input type="hidden" name="edit" id="edit" value="true">
-                        <input type="submit" value="Edit Profile" class="btn btn-primary btn-block">
-                        <a href="/profiles/changepw" id="chgpwd" name="chgpwd" class="btn btn-info btn-block">Change
-                            Password</a>
-                    </form>
+                        <div class="col-xs-6 col-sm-6 col-md-6">
+                            <div class="form-group">
+                                <div class="text-left">
+                                    <label for="year">Year</label>
+                                </div>
+                                <select name="year" id="year" class="form-control input-sm"
+                                        onchange="submitForm('selTermYr');">
+                                    <option value="0">Select a Year</option>
+                                    {% for yrrow in years %}
+                                    <option value="{{yrrow.id}}" {% if yrrow.id== currYear %}selected{% endif %}>
+                                        {{yrrow.year}}
+                                    </option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            </form>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <h4 class="">My Enrolled Courses</h4>
+                        <div class="">
+                            {% if enrolled|length > 0 %}
+                            <table class="table table-bordered table-hover table-condensed table-responsive"
+                                   id="enrolledCourses">
+                                {% for class in enrolled %}
+                                <tr>
+                                    <td>{{ class.courseNomenclature }}</td>
+                                    <td class="text-left">{{ class.courseName }}</td>
+                                    <td>
+                                        <button type="button" class="btn btn-info btn-sm" data-toggle="modal"
+                                                data-target="#enrolledModal{{ class.id }}">View
+                                        </button>
+                                    </td>
+                                    <!-- Modal -->
+                                    <div class="modal fade" id="enrolledModal{{class.id}}" role="dialog">
+                                        <div class="modal-dialog">
+                                            <!-- Modal content-->
+                                            <div class="modal-content">
+                                                <div class="modal-header">
+                                                    <button type="button" class="close" data-dismiss="modal">&times;
+                                                    </button>
+                                                    <h4 class="modal-title text-left" id="enclassName">{{
+                                                        class.courseNomenclature }} {{ class.courseName }}</h4>
+                                                </div>
+                                                <div class="modal-body text-left">
+                                                    <p>Credits: <i>{{ class.credits }}</i><br/>Term: {{ class.term
+                                                        }}<br/>Year: {{ class.year }}</p>
+                                                    <p id="courseDesc">{{ class.courseDesc }}</p>
+                                                </div>
+                                                <div class="modal-footer">
+                                                    <form method="post" action="/enroll/drop">
+                                                        <input type="hidden" id="enrolledId" name="enrolledId"
+                                                               value="{{ class.enrolledId }}">
+                                                        <input type="hidden" id="courseId" name="courseId"
+                                                               value="{{ class.id }}">
+                                                        <input type="hidden" id="courseNomen" name="courseNomen"
+                                                               value="{{ class.courseNomenclature }}">
+                                                        <input type="hidden" id="courseName" name="courseName"
+                                                               value="{{ class.courseName }}">
+                                                        <input type="hidden" id="courseTerm" name="courseTerm"
+                                                               value="{{ class.term }}">
+                                                        <input type="hidden" id="courseYear" name="courseYear"
+                                                               value="{{ class.year }}">
+                                                        <input class="btn btn-info btn-sm" type="submit"
+                                                               value="Drop Course">
+                                                    </form>
+                                                    <button type="button" class="btn btn-default"
+                                                            data-dismiss="modal">
+                                                        Close
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </tr>
+                                {% endfor %}
+                            </table>
+                            {% else %}
+                            <table class="table table-hover table-condensed table-responsive">
+                                <tr>
+                                    <td colspan="3">
+                                        <div class="text-center">None</div>
+                                    </td>
+                                </tr>
+                            </table>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="row">
+                        <h4 class="">My Wait List Courses</h4>
+                        <div class="">
+                            {% if waitlist|length > 0 %}
+                            <table class="table table-bordered table-hover table-condensed table-responsive" id="waitlistCourses">
+                                {% for wlclass in waitlist %}
+                                <tr>
+                                    <td>{{ wlclass.courseNomenclature }}</td>
+                                    <td class="text-left">{{ wlclass.courseName }}</td>
+                                    <td>
+                                        <button type="button" class="btn btn-info btn-sm" data-toggle="modal" data-target="#waitlistModal{{ wlclass.id }}">View
+                                        </button>
+                                    </td>
+                                    <!-- Modal -->
+                                    <div class="modal fade" id="waitlistModal{{ wlclass.id }}" role="dialog">
+                                        <div class="modal-dialog">
+                                            <!-- Modal content-->
+                                            <div class="modal-content">
+                                                <div class="modal-header">
+                                                    <button type="button" class="close" data-dismiss="modal">&times;
+                                                    </button>
+                                                    <h4 class="modal-title text-left" id="wlclassName">{{ wlclass.courseNomenclature }} {{ wlclass.courseName }}</h4>
+                                                </div>
+                                                <div class="modal-body text-left">
+                                                    <p>Credits: <i>{{ wlclass.credits }}</i><br/>Term: {{ wlclass.term }}<br/>Year: {{ wlclass.year }}</p>
+                                                    <p id="courseDesc">{{ wlclass.courseDesc }}</p>
+                                                    <p id="waitlistOrder"><i>You are #{{ wlclass.waitlistOrder }} on the wait list for this class.</i></p>
+                                                </div>
+                                                <div class="modal-footer">
+                                                    <button type="button" class="btn btn-default"
+                                                            data-dismiss="modal">
+                                                        Close
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </tr>
+                                {% endfor %}
+                            </table>
+                            {% else %}
+                            <table class="table table-hover table-condensed table-responsive">
+                                <tr>
+                                    <td colspan="3">
+                                        <div class="text-center">None</div>
+                                    </td>
+                                </tr>
+                            </table>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="row">
+                        <h4 class="">Available Courses</h4>
+                        <div class="">
+                            {% if courses|length > 0 %}
+                            <table class="table table-bordered table-hover table-condensed table-responsive"
+                                   id="availCourses">
+                                {% for course in courses %}
+                                <tr>
+                                    <td>{{ course.courseNomenclature }}</td>
+                                    <td class="text-left">{{ course.courseName }}</td>
+                                    <td>
+                                        <button type="button" class="btn btn-info btn-sm" data-toggle="modal"
+                                                data-target="#availableModal{{ course.id }}">View
+                                        </button>
+                                    </td>
+                                    <!-- Modal -->
+                                    <div class="modal fade" id="availableModal{{course.id}}" role="dialog">
+                                        <div class="modal-dialog">
+                                            <!-- Modal content-->
+                                            <div class="modal-content">
+                                                <div class="modal-header">
+                                                    <button type="button" class="close" data-dismiss="modal">&times;
+                                                    </button>
+                                                    <h4 class="modal-title text-left" id="courseName">{{
+                                                        course.courseNomenclature }} {{ course.courseName }}</h4>
+                                                </div>
+                                                <div class="modal-body text-left">
+                                                    <p>
+                                                        Credits: <i>{{ course.credits }}</i><br/>
+                                                        Term: {{ course.term }}<br/>
+                                                        Year: {{ course.year }}<br/>
+                                                    </p>
+                                                    <p id="courseDesc">{{ course.courseDesc }}</p>
+                                                    {% if course.fullCourse == 1 %}
+                                                    <p class="alert alert-danger" role="alert">
+                                                        <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>
+                                                        <i>This course is full!</i>
+                                                    </p>
+                                                    {% endif %}
+                                                </div>
+                                                <div class="modal-footer">
+                                                    <form method="post" action="/enroll/enroll">
+                                                        <input type="hidden" id="courseId" name="courseId" value="{{ course.id }}">
+                                                        <input type="hidden" id="termId" name="termId" value="{{ currTerm }}">
+                                                        <input type="hidden" id="yearId" name="yearId" value="{{ currYear }}">
+                                                        <input type="hidden" id="fullCourse" name="fullCourse" value="{{ course.fullCourse }}">
+                                                        {% if course.fullCourse == 1 %}
+                                                        <input class="btn btn-warning btn-sm" type="submit" value="Add To Waitlist">
+                                                        {% else %}
+                                                        <input class="btn btn-info btn-sm" type="submit" value="Enroll">
+                                                        {% endif %}
+                                                    </form>
+                                                    <button type="button" class="btn btn-default" data-dismiss="modal">
+                                                        Close
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </tr>
+                                {% endfor %}
+                            </table>
+                            {% else %}
+                            <table class="table table-bordered table-hover table-condensed table-responsive">
+                                <tr>
+                                    <td colspan="3">
+                                        <div class="text-center">None</div>
+                                    </td>
+                                </tr>
+                            </table>
+                            {% endif %}
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 </div>
 <script type="text/javascript">document.getElementById("enroll").className = "active";</script>
+<script type='text/javascript'>
+    function submitForm(id) {
+        // Call submit() method on <form id>
+        document.getElementById(id).submit();
+    }
+</script>
 {% endblock %}

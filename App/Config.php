@@ -52,6 +52,12 @@ class Config
      */
     const SHOW_ERRORS = true;
 
+    /**
+     * Session expiration duration in minutes
+     * @var integer
+     */
+    const EXPIRE_AFTER = 30;
+
     /** Public variables and arrays
      * @var int
      * @var string

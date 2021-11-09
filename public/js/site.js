@@ -33,3 +33,4 @@ function hideShowPwdConf() {
         $('#show_hide_confirmation i').addClass( "glyphicon-eye-open" );
     }
 }
+

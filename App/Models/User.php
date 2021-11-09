@@ -199,7 +199,7 @@ class User extends Model
     {
         $user = static::findByEmail($email);
         if ($user) {
-            if ($user['id'] != $ignore_id) {
+            if ($user[0]['id'] != $ignore_id) {
                 return true;
             }
         }
@@ -240,7 +240,7 @@ class User extends Model
     {
         $user = static::findByEmail($email);
         if ($user) {
-            if (Security::decrypt($user['password']) == $password) {
+            if (Security::decrypt($user[0]['password']) == $password) {
                 return $user;
             }
         }
@@ -339,6 +339,66 @@ class User extends Model
             }
         }
         return false;
+    }
+
+    /**
+     * Get notification message for given user ID.
+     * @param integer $id
+     * @return array  True if successful, false otherwise
+     */
+    public
+    static function getNotifyMessage($userId)
+    {
+        global $errors;
+        $sql = "SELECT * FROM tblnotifications WHERE userId = :userId";
+        $params = [':userId' => $userId ];
+        try {
+            $db = static::connectToPdo();
+            return static::executeSelectQuery($db, $sql, $params);
+        } catch (PDOException $e) {
+            $errors[] = "ERROR: " . $e->getMessage() . " (" . $e->getCode() . ")";
+            return false;
+        }
+    }
+
+    /**
+     * Reset notify flag for given user ID.
+     * @param integer $id
+     * @return boolean  True if successful, false otherwise
+     */
+    public
+    static function resetNotifyFlag($userId)
+    {
+        global $errors;
+        $sql = "UPDATE tbluser SET notifyFlag = 0 WHERE id = :userId";
+        $params = [':userId' => $userId ];
+        try {
+            $db = static::connectToPdo();
+            return static::executeQuery($db, $sql, $params);
+        } catch (PDOException $e) {
+            $errors[] = "ERROR: " . $e->getMessage() . " (" . $e->getCode() . ")";
+            return false;
+        }
+    }
+
+    /**
+     * Set notify flag for given user ID.
+     * @param integer $msgId
+     * @return boolean  True if successful, false otherwise
+     */
+    public
+    static function setViewedFlag($msgId)
+    {
+        global $errors;
+        $sql = "UPDATE tblnotifications SET viewed = 1 WHERE id = :msgId";
+        $params = [':msgId' => $msgId ];
+        try {
+            $db = static::connectToPdo();
+            return static::executeQuery($db, $sql, $params);
+        } catch (PDOException $e) {
+            $errors[] = "ERROR: " . $e->getMessage() . " (" . $e->getCode() . ")";
+            return false;
+        }
     }
 
     /**

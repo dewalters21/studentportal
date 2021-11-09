@@ -54,6 +54,24 @@ abstract class Controller
     }
 
     /**
+     * Array contains string with specific word
+     *
+     * @param array $myArray  Array of strings
+     * @param string $myWord  Word to find in strings
+     *
+     * @return bool
+     */
+    public function contains(array $myArray, string $myWord)
+    {
+        foreach($myArray AS $row) {
+            if (strpos($myWord, $row) !== FALSE) {
+                return TRUE;
+            }
+        }
+        return FALSE;
+    }
+
+    /**
      * Before filter - called before an action method.
      *
      * @return void

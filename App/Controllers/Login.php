@@ -34,18 +34,38 @@ class Login extends Controller
      */
     public function authAction()
     {
-        $user = User::authenticate($_POST['email'], $_POST['password']);
-        if ($user) {
-            Auth::login($user);
-            View::renderTemplate('/home/index.html', [
-                'current_user' => $_SESSION['username']
-            ]);
+        if ($_POST) {
+            $user = User::authenticate($_POST['email'], $_POST['password']);
+            if ($user) {
+                Auth::login($user[0]);
+                if ($user[0]['notifyFlag'] == 1) {
+                    $notification = User::getNotifyMessage($user[0]['id']);
+                    foreach($notification AS $notifyMsg) {
+                        if ($notifyMsg['viewed'] == 0) {
+                            $message .= $notifyMsg['message']."\n";
+                            User::setViewedFlag($notifyMsg['id']);
+                            User::resetNotifyFlag($user[0]['id']);
+                        } else {
+                            $message = "";
+                        }
+                    }
+                } else {
+                    $message = "";
+                }
+                View::renderTemplate('/home/index.html', [
+                    'user' => $user[0],
+                    'current_user' => $user[0]['firstName'],
+                    'message' => $message
+                ]);
+            } else {
+                $errors = ['Email address or password incorrect!'];
+                View::renderTemplate('/home/login.html', [
+                    'errors' => $errors,
+                    'email' => $_POST['email']
+                ]);
+            }
         } else {
-            $errors = ['Email address or password incorrect!'];
-            View::renderTemplate('/home/login.html', [
-                'errors' => $errors,
-                'email' => $_POST['email']
-            ]);
+            View::renderTemplate('/home/login.html');
         }
     }
 

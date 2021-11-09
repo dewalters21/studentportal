@@ -2,6 +2,8 @@
 
 namespace App\Controllers;
 
+use App\Auth;
+use App\Config;
 use Core\View;
 use Core\Controller;
 use App\Models\User;
@@ -16,6 +18,42 @@ class Profiles extends Controller
 {
 
     /**
+     * Before filter
+     *
+     * @return void
+     */
+    protected function before()
+    {
+        if (isset($_SESSION['last_action'])) { // Test to make sure the "last action" session variable was set.
+            $secondsInactive = time() - $_SESSION['last_action']; // How many seconds have passed since user's last action.
+            $expireAfterSeconds = Config::EXPIRE_AFTER * 60;
+            if ($secondsInactive >= $expireAfterSeconds) {
+                if (isset($_SESSION['user_id'])) {
+                    Auth::logout();
+                    $success = ['You have been logged out!'];
+                    View::renderTemplate('/home/login.html', [
+                        'success' => $success
+                    ]);
+                    exit(0);
+                } else {
+                    View::renderTemplate('/home/index.html');
+                    exit(0);
+                }
+            }
+        }
+    }
+
+    /**
+     * After filter
+     *
+     * @return void
+     */
+    protected function after()
+    {
+        $_SESSION['last_action'] = time();
+    }
+
+    /**
      * Show the student profile page
      *
      * @return void
@@ -24,16 +62,16 @@ class Profiles extends Controller
     {
         if (isset($_SESSION['user_id'])) {
             $user = User::findByID($_SESSION['user_id']);
-            $homephone = $user['homephone'];
-            $cellphone = $user['cellphone'];
-            $user['homephone'] = "(".substr($homephone, 0, 3).') '.substr($homephone, 3, 3).'-'.substr($homephone,6);
-            $user['cellphone'] = "(".substr($cellphone, 0, 3).') '.substr($cellphone, 3, 3).'-'.substr($cellphone,6);
-            $ssn = Security::decrypt($user['ssn']);
-            $user['ssn'] = substr($ssn, 0, 3).'-'.substr($ssn, 3, 2).'-'.substr($ssn,5);
-            $user['password'] = Security::decrypt($user['password']);
+            $homephone = $user[0]['homephone'];
+            $cellphone = $user[0]['cellphone'];
+            $user[0]['homephone'] = "(".substr($homephone, 0, 3).') '.substr($homephone, 3, 3).'-'.substr($homephone,6);
+            $user[0]['cellphone'] = "(".substr($cellphone, 0, 3).') '.substr($cellphone, 3, 3).'-'.substr($cellphone,6);
+            $ssn = Security::decrypt($user[0]['ssn']);
+            $user[0]['ssn'] = substr($ssn, 0, 3).'-'.substr($ssn, 3, 2).'-'.substr($ssn,5);
+            $user[0]['password'] = Security::decrypt($user[0]['password']);
             View::renderTemplate('profiles/index.html', [
-                'user' => $user,
-                'current_user' => $user['firstName']
+                'user' => $user[0],
+                'current_user' => $user[0]['firstName']
             ]);
         } else {
             $errors = ['You are not logged in!'];
@@ -53,10 +91,10 @@ class Profiles extends Controller
     {
         if (isset($_SESSION['user_id'])) {
             $user = User::findByID($_SESSION['user_id']);
-            $user['ssn'] = Security::decrypt($user['ssn']);
+            $user[0]['ssn'] = Security::decrypt($user[0]['ssn']);
             View::renderTemplate('/profiles/editprofile.html', [
-                'user' => $user,
-                'current_user' => $user['firstName']
+                'user' => $user[0],
+                'current_user' => $user[0]['firstName']
             ]);
         } else {
             $errors = ['You are not logged in!'];
@@ -90,14 +128,14 @@ class Profiles extends Controller
             $updateResult = User::updateProfile($data);
             if ($updateResult === true) {
                 $newUser = User::findByID($data['id']);
-                $newUser['ssn'] = Security::decrypt($newUser['ssn']);
-                $newUser['password'] = Security::decrypt($newUser['password']);
+                $newUser[0]['ssn'] = Security::decrypt($newUser[0]['ssn']);
+                $newUser[0]['password'] = Security::decrypt($newUser[0]['password']);
                 $success = ['Profile successfully updated!'];
-                User::sendToLog('Profile successfully updated for user '.$newUser['email'].'! ');
+                User::sendToLog('Profile successfully updated for user '.$newUser[0]['email'].'! ');
                 View::renderTemplate('/profiles/index.html', [
                     'success' => $success,
-                    'user' => $newUser,
-                    'current_user' => $newUser['firstName']
+                    'user' => $newUser[0],
+                    'current_user' => $newUser[0]['firstName']
                 ]);
             } else {
                 $errors = $updateResult;
@@ -128,10 +166,10 @@ class Profiles extends Controller
         if (isset($_SESSION['user_id'])) {
             $user = User::findByID($_SESSION['user_id']);
             View::renderTemplate('/profiles/changepwd.html', [
-				'id' => $user['id'],
-                'firstName' => $user['firstName'],
-				'lastName' => $user['lastName'],
-                'current_user' => $user['firstName']
+				'id' => $user[0]['id'],
+                'firstName' => $user[0]['firstName'],
+				'lastName' => $user[0]['lastName'],
+                'current_user' => $user[0]['firstName']
             ]);
         } else {
             $errors = ['You are not logged in!'];
@@ -156,19 +194,19 @@ class Profiles extends Controller
                     ];
             if (User::updatePassword($data)) {
                 $user = User::findByID($_POST['id']);
-                $homephone = $user['homephone'];
-                $cellphone = $user['cellphone'];
-                $user['homephone'] = "(".substr($homephone, 0, 3).') '.substr($homephone, 3, 3).'-'.substr($homephone,6);
-                $user['cellphone'] = "(".substr($homephone, 0, 3).') '.substr($cellphone, 3, 3).'-'.substr($cellphone,6);
-                $ssn = Security::decrypt($user['ssn']);
-                $user['ssn'] = substr($ssn, 0, 3).'-'.substr($ssn, 3, 2).'-'.substr($ssn,5);
-                $user['password'] = Security::decrypt($user['password']);
+                $homephone = $user[0]['homephone'];
+                $cellphone = $user[0]['cellphone'];
+                $user[0]['homephone'] = "(".substr($homephone, 0, 3).') '.substr($homephone, 3, 3).'-'.substr($homephone,6);
+                $user[0]['cellphone'] = "(".substr($homephone, 0, 3).') '.substr($cellphone, 3, 3).'-'.substr($cellphone,6);
+                $ssn = Security::decrypt($user[0]['ssn']);
+                $user[0]['ssn'] = substr($ssn, 0, 3).'-'.substr($ssn, 3, 2).'-'.substr($ssn,5);
+                $user[0]['password'] = Security::decrypt($user['password']);
                 $success = ['Password successfully updated!'];
-                User::sendToLog('Password successfully updated for user '.$user['email'].'!');
+                User::sendToLog('Password successfully updated for user '.$user[0]['email'].'!');
                 View::renderTemplate('/profiles/index.html', [
                     'success' => $success,
-                    'user' => $user,
-                    'current_user' => $user['firstName']
+                    'user' => $user[0],
+                    'current_user' => $user[0]['firstName']
                 ]);
             } else {
                 $errors = ['Password update failed for user '.$data['id'].'!'];

@@ -35,7 +35,7 @@ abstract class Model
             try {
                 $dbLink = new PDO($connStr, Config::DB_USER, Config::DB_PASSWORD, $options);
             } catch (PDOException $e) {
-                $errors[] = "ERROR : " . $e->getMessage() . " (" . $e->getCode() . ")";
+                $errors[] = "ERROR: " . $e->getMessage() . " (" . $e->getCode() . ")";
                 foreach($errors as $error) {
                     User::sendToLog(date('G:i:s').": ".$error.PHP_EOL);
                 }
@@ -61,6 +61,7 @@ abstract class Model
      * Returns:        boolean
     \*****************************************************/
     public static function executeQuery(PDO $con, string $sql, array $params=[]) {
+        global $errors;
         $actions = ["insert", "update", "delete"];
         $action = strtolower(substr($sql,0, 6 ));
         if (in_array($action, $actions)) {
@@ -68,12 +69,12 @@ abstract class Model
                 $stmt = $con->prepare($sql);
                 $results = $stmt->execute($params);
             } catch (PDOException $e) {
-                echo "ERROR : " . $e->getMessage() . " (" . $e->getCode() . ")<br>";
+                $errors[] = "ERROR: " . $e->getMessage() . " (" . $e->getCode() . ")";
                 return false;
             }
             return $results;
         } else {
-            echo("Invalid SQL statement! Must be an insert, update, or delete query.");
+            $errors[] = "Invalid SQL statement! Must be an insert, update, or delete query.";
             return false;
         }
     }
@@ -87,6 +88,7 @@ abstract class Model
      * Returns:        Query result set or false
     \*****************************************************/
     public static function executeSelectQuery(PDO $con, string $sql, array $params=[]) {
+        global $errors;
         $action = strtolower(substr($sql,0, 6 ));
         if ($action == "select") {
             try {
@@ -94,13 +96,14 @@ abstract class Model
                 $stmt->execute($params);
                 $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
             } catch (PDOException $e) {
-                echo "ERROR : " . $e->getMessage() . " (" . $e->getCode() . ")<br>";
+                $errors[] = "ERROR: " . $e->getMessage() . " (" . $e->getCode() . ")";
                 return false;
             }
-            if (!empty($result)) { $result = $result[0]; }
+            //echo($sql." = ".sizeof($result)."<br/>");
+            //if (!empty($result) && (sizeof($result) <= 1)) { $result = $result[0]; }
             return $result;
         } else {
-            echo("Invalid SQL statement!");
+            $errors[] = "Invalid SQL statement!";
             return false;
         }
     }
@@ -148,9 +151,9 @@ abstract class Model
         $data = openssl_decrypt($first_encrypted,$method,$first_key,OPENSSL_RAW_DATA,$iv);
         $second_encrypted_new = hash_hmac('sha3-512', $first_encrypted, $second_key, TRUE);
 
-        if (hash_equals($second_encrypted,$second_encrypted_new))
+        if (hash_equals($second_encrypted,$second_encrypted_new)) {
             return $data;
-
+        }
         return false;
     }
 
