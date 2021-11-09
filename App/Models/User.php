@@ -40,8 +40,8 @@ class User extends Model
     public static function create()
     {
         global $errors;
-        User::validate($_POST);
-        User::validatePwd($_POST['password']);
+        static::validate($_POST);
+        static::validatePwd($_POST['password']);
         if (empty($errors)) {
             $sql = "INSERT INTO tbluser (firstName, lastName, streetAddr, city, state, zipcode, email, homephone, cellphone, ssn, password) VALUES (:first_name, :last_name, :streetAddr, :city, :state, :zipcode, :email, :homephone, :cellphone, :ssn, :password)";
             $params = [
@@ -162,28 +162,28 @@ class User extends Model
      * @param array $data
      * @return void
      */
-    public static function validatePwd(array $data): void
+    public static function validatePwd(string $data): void
     {
         global $errors;
         /** Password **/
-        if (isset($data['password'])) {
-            if (strlen($data['password']) < 8) {
+        if (isset($data)) {
+            if (strlen($data) < 8) {
                 $errors[] = 'Please enter at least 8 characters for the password.'.PHP_EOL;
             }
-            if (preg_match('/.*[a-z]+.*/i', $data['password']) == 0) {
+            if (preg_match('/.*[a-z]+.*/i', $data) == 0) {
                 $errors[] = 'Password needs at least one lowercase letter.'.PHP_EOL;
             }
-            if (preg_match('/.*[A-Z]+.*/i', $data['password']) == 0) {
+            if (preg_match('/.*[A-Z]+.*/i', $data) == 0) {
                 $errors[] = 'Password needs at least one uppercase letter.'.PHP_EOL;
             }
-            if (preg_match('/.*\d+.*/i', $data['password']) == 0) {
+            if (preg_match('/.*\d+.*/i', $data) == 0) {
                 $errors[] = 'Password needs at least one number.'.PHP_EOL;
             }
-            if (preg_match('/.*[!@#$%^&*-]+.*/i', $data['password']) == 0) {
+            if (preg_match('/.*[!@#$%^&*-]+.*/i', $data) == 0) {
                 $errors[] = 'Password needs at least one special character (!@#$%^&*-).'.PHP_EOL;
             }
         } else {
-            $errors[] = 'No password to valide.'.PHP_EOL;
+            $errors[] = 'No password to validate.'.PHP_EOL;
         }
     }
 

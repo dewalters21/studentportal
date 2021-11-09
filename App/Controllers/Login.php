@@ -38,6 +38,7 @@ class Login extends Controller
             $user = User::authenticate($_POST['email'], $_POST['password']);
             if ($user) {
                 Auth::login($user[0]);
+                $message = "";
                 if ($user[0]['notifyFlag'] == 1) {
                     $notification = User::getNotifyMessage($user[0]['id']);
                     foreach($notification AS $notifyMsg) {
